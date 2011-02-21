@@ -1,0 +1,9 @@
+SBsuite is the script jkwood uses for generating the bare framework
+for SlackBuilds. In specific, it autofills the .info file, creates
+a default README and slack-desc, and produces a .SlackBuild file with
+sane defaults.
+
+It's natural that each build will require some editing, whether due 
+to unconventional file layout, differing build systems, nonstandard
+documentation files, or just plain hardcoding. However, this script
+is set up to get you up and running with a single command.
