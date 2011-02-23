@@ -23,7 +23,9 @@
 # 11222008: Initial version 1.0
 # 01112009: Version 1.01, fix find bug, add CHANGELOG
 # 01192009: Version 1.02, fix PRGNAM bug
-# 01212009  Version 1.03, fix no = in i486 SLKCFLAGS
+# 01212009: Version 1.03, fix no = in i486 SLKCFLAGS
+# 03112010: Update for 13.0 
+# 04152010: Fix missing comma - thanks wario
 
 # You'll be wanting to put your own info here.
 # Otherwise, people will know that you didn't
@@ -79,10 +81,13 @@ def makeBuild
                     "",
                     "if [ \"$ARCH\" = \"i486\" ]; then",
                     "  SLKCFLAGS=\"-O2 -march=i486 -mtune=i686\"",
+		    "  LIBDIRSUFFIX=\"\"",
                     "elif [ \"$ARCH\" = \"i686\" ]; then",
                     "  SLKCFLAGS=\"-O2 -march=i686 -mtune=i686\"",
+		    "  LIBDIRSUFFIX=\"\"",
                     "elif [ \"$ARCH\" = \"x86_64\" ]; then",
                     "  SLKCFLAGS=\"-O2 -fPIC\"",
+		    "  LIBDIRSUFFIX=\"64\"",
                     "fi",
                     "",
                     if ($DISTRO)
@@ -93,7 +98,7 @@ def makeBuild
                     "mkdir -p $TMP $PKG $OUTPUT",
                     "cd $TMP || exit 1",
                     "rm -rf $PRGNAM-$VERSION",
-                    "tar -x#{if $SRC[-2..-1] == 'gz'; 'z'; else; 'j'; end}vf $CWD/$PRGNAM-$VERSION.tar.#{if $SRC[-2..-1] == 'gz'; 'gz'; else; 'bz2'; end} || exit 1",
+                    "tar -xvf $CWD/$PRGNAM-$VERSION.tar.#{if $SRC[-2..-1] == 'gz'; 'gz'; else; 'bz2'; end} || exit 1",
                     "cd $PRGNAM-$VERSION || exit 1",
                     "chown -R root:root .",
                     "find . \\( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \\) \\",
@@ -104,16 +109,14 @@ def makeBuild
                     "CFLAGS=\"$SLKCFLAGS\" \\",
                     "CXXFLAGS=\"$SLKCFLAGS\" \\",
                     if ($DISTRO == "slamd64") 
-                        "LDFLAGS=\"-L/lib64 -L/usr/lib64\" \\"
+                        "LDFLAGS=\"-L/lib${LIBDIRSUFFIX} -L/usr/lib${LIBDIRSUFFIX}\" \\"
                     end,
                     "./configure \\",
                     "  --prefix=/usr \\",
                     "  --sysconfdir=/etc \\",
                     "  --docdir=/usr/doc/$PRGNAM-$VERSION \\",
                     "  --mandir=/usr/man \\",
-                    if ($DISTRO == "slamd64")
-                        "  --libdir=/usr/lib64 \\"
-                    end,
+                    "  --libdir=/usr/lib${LIBDIRSUFFIX} \\,"
                     "  --build=$ARCH-slackware-linux \\",
                     "  || exit 1",
                     "",
@@ -160,6 +163,8 @@ def createInfo
                "HOMEPAGE=\"#{$HOMEPAGE}\"",
                "DOWNLOAD=\"#{$DOWNLOAD}\"",
                "MD5SUM=\"#{%x{/usr/bin/md5sum #{$SRC} | cut -d \\  -f 1}.chomp}\"",
+	       "DOWNLOAD_x86_64=\"\"",
+	       "MD5SUM_x86_64=\"\"",
                "MAINTAINER=\"#{$AUTHOR}\"",
                "EMAIL=\"#{$EMAIL}\"",
                "APPROVED=\"\"" ]
